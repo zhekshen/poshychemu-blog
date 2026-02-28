@@ -4,25 +4,62 @@
 <div class="row">
     <div class="col-md-6 offset-md-3">
         <div class="bg-white p-4 rounded shadow-sm">
-            <h2 class="mb-4">Анкета рыбака</h2>
-            <form method="post">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                            <div class="form-text">{{ field.help_text }}</div>
+            {% if edit_mode %}
+                <h2 class="mb-4 text-center">Заполнить анкету рыбака</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label"><strong>{{ field.label }}</strong></label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="form-text">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    <div class="mt-4 d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Сохранить анкету</button>
+                        {% if survey %}
+                            <a href="{% url 'survey' %}" class="btn btn-outline-secondary">Отмена</a>
                         {% endif %}
-                        {% for error in field.errors %}
-                            <div class="text-danger small">{{ error }}</div>
-                        {% endfor %}
                     </div>
-                {% endfor %}
-                <div class="mt-4 d-grid">
-                    <button type="submit" class="btn btn-primary">Сохранить анкету</button>
+                </form>
+            {% else %}
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                    <h2 class="mb-0">Моя анкета</h2>
+                    <a href="{% url 'survey' %}?edit=1" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Редактировать
+                    </a>
                 </div>
-            </form>
+                
+                <div class="survey-details">
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Имя пользователя</label>
+                        <p class="fs-5 mb-0">{{ user.username }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Опыт в рыбалке</label>
+                        <p class="fs-5 mb-0">{{ survey.get_fishing_experience_display }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Любимая рыба</label>
+                        <p class="fs-5 mb-0">{{ survey.favorite_fish }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">Предпочитаемые снасти</label>
+                        <p class="fs-5 mb-0">{{ survey.preferred_gear }}</p>
+                    </div>
+                    {% if survey.about_me %}
+                    <div class="mb-3">
+                        <label class="text-muted small d-block">О себе</label>
+                        <p class="fs-5 mb-0">{{ survey.about_me|linebreaksbr }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -71,6 +71,8 @@ def survey(request):
     except UserSurvey.DoesNotExist:
         user_survey = None
 
+    edit_mode = request.GET.get('edit') == '1' or user_survey is None
+
     if request.method == 'POST':
         form = UserSurveyForm(request.POST, instance=user_survey)
         if form.is_valid():
@@ -78,10 +80,15 @@ def survey(request):
             survey_instance.user = request.user
             survey_instance.save()
             messages.success(request, 'Анкета успешно сохранена!')
-            return redirect('home')
+            return redirect('survey')
     else:
         form = UserSurveyForm(instance=user_survey)
-    return render(request, 'blog/survey.html', {'form': form})
+    
+    return render(request, 'blog/survey.html', {
+        'form': form, 
+        'survey': user_survey,
+        'edit_mode': edit_mode
+    })
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
