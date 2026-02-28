@@ -8,12 +8,13 @@
             <img src="{{ post.image.url }}" class="img-fluid mb-4 rounded w-100" alt="{{ post.title }}" style="max-height: 400px; object-fit: cover;">
             {% endif %}
             <h1>{{ post.title }}</h1>
-            <div class="text-muted mb-4 border-bottom pb-2">
-                Автор: {{ post.author }} | Опубликовано: {{ post.created_date|date:"d M Y" }}
-                {% if post.author == user %}
-                    <span class="ms-2">
+            <div class="text-muted mb-4 border-bottom pb-2 d-flex justify-content-between align-items-center">
+                <span>Автор: {{ post.author }} | Опубликовано: {{ post.created_date|date:"d M Y" }}</span>
+                {% if post.author == user or user.is_superuser %}
+                    <div class="btn-group">
                         <a href="{% url 'post_edit' post.pk %}" class="btn btn-sm btn-outline-secondary">Редактировать</a>
-                    </span>
+                        <a href="{% url 'post_delete' post.pk %}" class="btn btn-sm btn-outline-danger">Удалить статью</a>
+                    </div>
                 {% endif %}
             </div>
 
@@ -31,6 +32,50 @@
             </div>
             <div class="mt-5">
                 <a href="{% url 'home' %}" class="btn btn-secondary">Назад ко всем статьям</a>
+            </div>
+
+            <!-- Раздел комментариев -->
+            <hr class="my-5">
+            <div class="comments-section">
+                <h3 class="mb-4">Комментарии ({{ comments.count }})</h3>
+
+                {% if user.is_authenticated %}
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Оставить комментарий</h5>
+                            <form action="{% url 'add_comment' post.pk %}" method="post">
+                                {% csrf_token %}
+                                {{ comment_form.text }}
+                                <button type="submit" class="btn btn-primary mt-3">Отправить</button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        Пожалуйста, <a href="{% url 'login' %}">войдите</a>, чтобы оставить комментарий.
+                    </div>
+                {% endif %}
+
+                {% for comment in comments %}
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="card-subtitle text-primary">{{ comment.author.username }}</h6>
+                                <div>
+                                    <small class="text-muted me-2">{{ comment.created_date|date:"d.m.Y H:i" }}</small>
+                                    {% if user.is_superuser or user == comment.author or user == post.author %}
+                                        <a href="{% url 'delete_comment' comment.pk %}" class="text-danger" title="Удалить комментарий" onclick="return confirm('Вы уверены?')">
+                                            <i class="bi bi-trash"></i> Удалить
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <p class="card-text">{{ comment.text|linebreaks }}</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">Пока нет комментариев. Будьте первым!</p>
+                {% endfor %}
             </div>
         </article>
     </div>

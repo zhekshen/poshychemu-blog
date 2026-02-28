@@ -6,6 +6,7 @@
     <title>Poshychemu.com - Блог о рыбалке</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     {% load static %}
@@ -59,6 +60,7 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Главная</a></li>
                 {% if user.is_authenticated %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'survey' %}">Моя анкета</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'post_create' %}">Создать статью</a></li>
                     <li class="nav-item">
                         <form method="post" action="{% url 'logout' %}" class="d-inline">
