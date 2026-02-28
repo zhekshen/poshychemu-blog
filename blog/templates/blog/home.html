@@ -1,0 +1,80 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    {% if slider_posts %}
+    <div class="hero-slider">
+        <div class="swiper mySwiper">
+            <div class="swiper-wrapper">
+                {% for post in slider_posts %}
+                <div class="swiper-slide">
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                    {% else %}
+                    <div style="width:100%; height:100%; background: #1a4d2e; display: flex; align-items: center; justify-content: center; color: white;">
+                        <h3>{{ post.title }}</h3>
+                    </div>
+                    {% endif %}
+                    <div class="slide-content">
+                        <h2>{{ post.title }}</h2>
+                        <p>{{ post.content|truncatewords:20 }}</p>
+                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Читать далее</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Последние статьи</h3>
+            <div class="row">
+                {% for post in posts %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        {% if post.image %}
+                        <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="card-text text-muted small">
+                                Автор: {{ post.author }} | {{ post.created_date|date:"d.m.Y" }}
+                            </p>
+                            <p class="card-text">{{ post.content|truncatewords:20 }}</p>
+                            <a href="{% url 'post_detail' post.pk %}" class="btn btn-outline-success">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p>Пока нет ни одной статьи. Будьте первым!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var swiper = new Swiper(".mySwiper", {
+        loop: true,
+        autoplay: {
+            delay: 5000,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+        },
+        navigation: {
+            nextEl: ".swiper-button-next",
+            prevEl: ".swiper-button-prev",
+        },
+    });
+</script>
+{% endblock %}

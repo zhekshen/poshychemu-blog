@@ -1,0 +1,56 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="bg-white p-4 rounded shadow-sm">
+            <h2 class="mb-4">{% if form.instance.pk %}Редактировать статью{% else %}Создать новую статью{% endif %}</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Заголовок</label>
+                    <input type="text" name="title" class="form-control" id="{{ form.title.id_for_label }}" value="{{ form.title.value|default_if_none:'' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.content.id_for_label }}" class="form-label">Содержание</label>
+                    <textarea name="content" class="form-control" id="{{ form.content.id_for_label }}" rows="10" required>{{ form.content.value|default_if_none:'' }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.image.id_for_label }}" class="form-label">Изображение (для слайдера и статьи)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="image" class="form-control file-input-custom" id="{{ form.image.id_for_label }}" onchange="updateFileLabel(this)">
+                        <span class="file-status-text" id="status-{{ form.image.id_for_label }}">Нет выбранных файлов</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.video.id_for_label }}" class="form-label">Видеофайл (необязательно)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" name="video" class="form-control file-input-custom" id="{{ form.video.id_for_label }}" onchange="updateFileLabel(this)">
+                        <span class="file-status-text" id="status-{{ form.video.id_for_label }}">Нет выбранных файлов</span>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                    <a href="{% if form.instance.pk %}{% url 'post_detail' form.instance.pk %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-secondary ms-2">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateFileLabel(input) {
+        const statusId = 'status-' + input.id;
+        const statusSpan = document.getElementById(statusId);
+        if (input.files && input.files.length > 0) {
+            statusSpan.textContent = input.files[0].name;
+            statusSpan.style.color = '#212529'; // Цвет для выбранного файла
+        } else {
+            statusSpan.textContent = 'Нет выбранных файлов';
+            statusSpan.style.color = '#6c757d'; // Стандартный серый
+        }
+    }
+</script>
+{% endblock %}
